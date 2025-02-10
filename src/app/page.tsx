@@ -1,48 +1,89 @@
-import Link from "next/link";
+'use client';
 
-export default function Home() {
+import { useAuth } from '@/lib/hooks/useAuth';
+import { motion } from 'framer-motion';
+import { LogIn, LogOut } from 'lucide-react';
+import Link from 'next/link';
+
+export default function LandingPage() {
+  const { signInWithGoogle, signOut, user } = useAuth();
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-8">
-      <div>
-        <h2 className="text-2xl font-semibold text-center border p-4 font-mono rounded-md">
-          Get started by choosing a template path from the /paths/ folder.
-        </h2>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100">
+      <div className="container mx-auto px-4 py-16">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center"
+        >
+          <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
+            Construction Project Management
+          </h1>
+          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+            Streamline your construction projects with our comprehensive management solution. 
+            Track projects, manage expenses, and generate reports all in one place.
+          </p>
+          
+          {!user ? (
+            <button
+              onClick={signInWithGoogle}
+              className="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 
+                         text-white font-medium rounded-lg transition-colors"
+            >
+              <LogIn className="w-5 h-5 mr-2" />
+              Sign in with Google
+            </button>
+          ) : (
+            <div className="space-y-4">
+              <p className="text-gray-600">Welcome, {user.email}</p>
+              <div className="space-x-4">
+                <Link
+                  href="/dashboard"
+                  className="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 
+                           text-white font-medium rounded-lg transition-colors"
+                >
+                  Go to Dashboard
+                </Link>
+                <button
+                  onClick={signOut}
+                  className="inline-flex items-center px-6 py-3 bg-gray-600 hover:bg-gray-700 
+                           text-white font-medium rounded-lg transition-colors"
+                >
+                  <LogOut className="w-5 h-5 mr-2" />
+                  Sign Out
+                </button>
+              </div>
+            </div>
+          )}
+        </motion.div>
+
+        <div className="mt-16 grid md:grid-cols-3 gap-8">
+          <FeatureCard 
+            title="Project Management"
+            description="Track progress, manage resources, and coordinate teams efficiently."
+          />
+          <FeatureCard 
+            title="Financial Tracking"
+            description="Monitor expenses, track budgets, and manage office costs seamlessly."
+          />
+          <FeatureCard 
+            title="Reporting"
+            description="Generate detailed reports and insights for better decision making."
+          />
+        </div>
       </div>
-      <div>
-        <h1 className="text-6xl font-bold text-center">Make anything you imagine 🪄</h1>
-        <h2 className="text-2xl text-center font-light text-gray-500 pt-4">
-          This whole page will be replaced when you run your template path.
-        </h2>
-      </div>
-      <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="border rounded-lg p-6 hover:bg-gray-100 transition-colors">
-          <h3 className="text-xl font-semibold">AI Chat App</h3>
-          <p className="mt-2 text-sm text-gray-600">
-            An intelligent conversational app powered by AI models, featuring real-time responses
-            and seamless integration with Next.js and various AI providers.
-          </p>
-        </div>
-        <div className="border rounded-lg p-6 hover:bg-gray-100 transition-colors">
-          <h3 className="text-xl font-semibold">AI Image Generation App</h3>
-          <p className="mt-2 text-sm text-gray-600">
-            Create images from text prompts using AI, powered by the Replicate API and Next.js.
-          </p>
-        </div>
-        <div className="border rounded-lg p-6 hover:bg-gray-100 transition-colors">
-          <h3 className="text-xl font-semibold">Social Media App</h3>
-          <p className="mt-2 text-sm text-gray-600">
-            A feature-rich social platform with user profiles, posts, and interactions using
-            Firebase and Next.js.
-          </p>
-        </div>
-        <div className="border rounded-lg p-6 hover:bg-gray-100 transition-colors">
-          <h3 className="text-xl font-semibold">Voice Notes App</h3>
-          <p className="mt-2 text-sm text-gray-600">
-            A voice-based note-taking app with real-time transcription using Deepgram API, 
-            Firebase integration for storage, and a clean, simple interface built with Next.js.
-          </p>
-        </div>
-      </div>
-    </main>
+    </div>
+  );
+}
+
+function FeatureCard({ title, description }: { title: string; description: string }) {
+  return (
+    <motion.div
+      whileHover={{ scale: 1.05 }}
+      className="p-6 bg-white rounded-xl shadow-md"
+    >
+      <h3 className="text-xl font-semibold text-gray-900 mb-3">{title}</h3>
+      <p className="text-gray-600">{description}</p>
+    </motion.div>
   );
 }
