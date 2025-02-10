@@ -58,10 +58,13 @@ interface Document {
   id: string;
   name: string;
   category: string;
+  mainCategory: 'owner' | 'construction' | 'contractor';
+  subCategory: string;
   size: string;
   uploadedDate: string;
   uploadedBy: string;
-  url: string; // Add this
+  url: string;
+  description?: string;
 }
 
 interface Task {
@@ -106,6 +109,13 @@ interface ShareModalState {
   documentName?: string;
 }
 
+// Update the uploadForm state type
+interface UploadFormState {
+  name: string;
+  file: File | null;
+  description: string;
+}
+
 export default function ProjectDetailPage() {
   const [activeTab, setActiveTab] = useState('overview');
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
@@ -117,9 +127,9 @@ export default function ProjectDetailPage() {
   const [transactionAttachments, setTransactionAttachments] = useState<File[]>([]);
   const [selectedMainCategory, setSelectedMainCategory] = useState<'owner' | 'construction' | 'contractor' | ''>('');
   const [selectedSubCategory, setSelectedSubCategory] = useState('');
-  const [uploadForm, setUploadForm] = useState({
+  const [uploadForm, setUploadForm] = useState<UploadFormState>({
     name: '',
-    file: null as File | null,
+    file: null,
     description: '',
   });
   const [taskForm, setTaskForm] = useState({
@@ -354,29 +364,29 @@ export default function ProjectDetailPage() {
   const handleUploadSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!uploadForm.file) return;
+    if (!uploadForm.file || !selectedMainCategory || !selectedSubCategory) return;
 
     try {
+      // Create document with all required properties
       const newDoc = await uploadProjectDocument(
-        'current-project-id', // Replace with actual project ID
+        'current-project-id',
         uploadForm.file,
         {
           mainCategory: selectedMainCategory,
           subCategory: selectedSubCategory,
           description: uploadForm.description,
-          uploadedBy: 'Current User Name' // Replace with actual user name
+          category: selectedSubCategory,
+          uploadedBy: 'Current User Name'
         }
       );
 
-      // Add new document to the list
+      // Use the returned document directly as it has all required properties
       setDocuments(prev => [newDoc, ...prev]);
       
-      // Close modal and reset form
       setIsUploadModalOpen(false);
       resetUploadForm();
     } catch (error) {
       console.error('Error uploading document:', error);
-      // Handle error (show error message to user)
     }
   };
 

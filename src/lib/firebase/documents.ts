@@ -1,79 +1,72 @@
 import { db, storage } from './firebase';
-import { collection, addDoc, query, where, getDocs, orderBy } from 'firebase/firestore';
+import { collection, addDoc, query, where, getDocs, orderBy, doc, setDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 export interface ProjectDocument {
   id: string;
-  projectId: string;
   name: string;
   category: string;
+  mainCategory: 'owner' | 'construction' | 'contractor';
+  subCategory: string;
   size: string;
   uploadedDate: string;
   uploadedBy: string;
   url: string;
-  mainCategory: string;
+  description?: string;
+}
+
+interface UploadMetadata {
+  mainCategory: 'owner' | 'construction' | 'contractor';
   subCategory: string;
+  description?: string;
+  category: string;
+  uploadedBy: string;
 }
 
 export async function uploadProjectDocument(
   projectId: string,
   file: File,
-  metadata: {
-    mainCategory: string;
-    subCategory: string;
-    description: string;
-    uploadedBy: string;
-  }
-) {
+  metadata: UploadMetadata
+): Promise<ProjectDocument> {
   try {
-    // 1. Upload file to Firebase Storage
+    // Upload file to Firebase Storage
     const storageRef = ref(storage, `projects/${projectId}/documents/${file.name}`);
-    await uploadBytes(storageRef, file);
-    const downloadUrl = await getDownloadURL(storageRef);
+    const uploadResult = await uploadBytes(storageRef, file);
+    const downloadURL = await getDownloadURL(uploadResult.ref);
 
-    // 2. Create document record in Firestore
-    const docRef = await addDoc(collection(db, 'documents'), {
-      projectId,
+    // Create document metadata
+    const docData: ProjectDocument = {
+      id: `doc-${Date.now()}`,
       name: file.name,
-      size: `${(file.size / (1024 * 1024)).toFixed(2)} MB`,
-      uploadedDate: new Date().toISOString(),
-      uploadedBy: metadata.uploadedBy,
-      url: downloadUrl,
+      category: metadata.category,
       mainCategory: metadata.mainCategory,
       subCategory: metadata.subCategory,
-      description: metadata.description,
-      createdAt: new Date().toISOString()
-    });
-
-    return {
-      id: docRef.id,
-      projectId,
-      name: file.name,
-      size: `${(file.size / (1024 * 1024)).toFixed(2)} MB`,
+      size: `${(file.size / 1024 / 1024).toFixed(2)} MB`,
       uploadedDate: new Date().toISOString(),
       uploadedBy: metadata.uploadedBy,
-      url: downloadUrl,
-      mainCategory: metadata.mainCategory,
-      subCategory: metadata.subCategory
+      url: downloadURL,
+      description: metadata.description
     };
+
+    // Save document metadata to Firestore
+    const docRef = doc(db, 'projects', projectId, 'documents', docData.id);
+    await setDoc(docRef, docData);
+
+    return docData;
   } catch (error) {
     console.error('Error uploading document:', error);
     throw error;
   }
 }
 
-export async function getProjectDocuments(projectId: string) {
+export async function getProjectDocuments(projectId: string): Promise<ProjectDocument[]> {
   try {
-    const q = query(
-      collection(db, 'documents'),
-      where('projectId', '==', projectId),
-      orderBy('createdAt', 'desc')
-    );
+    const docsRef = collection(db, 'projects', projectId, 'documents');
+    const snapshot = await getDocs(docsRef);
     
-    const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
+    return snapshot.docs.map(doc => ({
+      ...doc.data(),
+      id: doc.id
     })) as ProjectDocument[];
   } catch (error) {
     console.error('Error getting documents:', error);
