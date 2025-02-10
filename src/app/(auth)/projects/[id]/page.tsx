@@ -481,7 +481,6 @@ export default function ProjectDetailPage() {
   };
 
   const handleAddPayment = (taskId: string, taskName: string) => {
-    // Open the add transaction modal with pre-filled task information
     setIsAddTransactionModalOpen(true);
     setTransactionForm({
       date: getTodayDate(),
