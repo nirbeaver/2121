@@ -262,7 +262,7 @@ export default function ProjectDetailPage() {
   // Update the documents state to use ProjectDocument type
   const [documents, setDocuments] = useState<ProjectDocument[]>([]);
 
-  // Add this state declaration
+  // Group all transaction-related state and functions together
   const [transactionForm, setTransactionForm] = useState<TransactionFormState>({
     date: getTodayDate(),
     description: '',
@@ -280,6 +280,28 @@ export default function ProjectDetailPage() {
     linkedSubcontractorId: '',
     attachments: []
   });
+
+  // Define all transaction-related functions together
+  const resetTransactionForm = () => {
+    setTransactionForm({
+      date: getTodayDate(),
+      description: '',
+      category: 'Payment',
+      amount: '',
+      paymentMethod: 'Bank',
+      creditCardType: '',
+      lastFourDigits: '',
+      bankName: '',
+      checkNumber: '',
+      digitalPaymentUsername: '',
+      status: 'completed',
+      reference: generateTransactionReference(),
+      linkedTaskId: '',
+      linkedSubcontractorId: '',
+      attachments: []
+    });
+    setTransactionAttachments([]);
+  };
 
   // Add this effect to load documents
   useEffect(() => {
@@ -611,28 +633,6 @@ export default function ProjectDetailPage() {
         ));
       }
     }
-  };
-
-  // Move resetTransactionForm up, before it's used
-  const resetTransactionForm = () => {
-    setTransactionForm({
-      date: getTodayDate(),
-      description: '',
-      category: 'Payment',
-      amount: '',
-      paymentMethod: 'Bank',
-      creditCardType: '',
-      lastFourDigits: '',
-      bankName: '',
-      checkNumber: '',
-      digitalPaymentUsername: '',
-      status: 'completed',
-      reference: generateTransactionReference(),
-      linkedTaskId: '',
-      linkedSubcontractorId: '',
-      attachments: []
-    });
-    setTransactionAttachments([]);
   };
 
   // Add this new component for viewing attachments
