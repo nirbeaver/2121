@@ -116,6 +116,16 @@ interface UploadFormState {
   description: string;
 }
 
+// Move these helper functions up, before they're used
+const getTodayDate = () => new Date().toISOString().split('T')[0];
+
+const generateTransactionReference = () => {
+  const prefix = 'TRX';
+  const timestamp = Date.now().toString().slice(-6);
+  const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+  return `${prefix}-${timestamp}-${random}`;
+};
+
 export default function ProjectDetailPage() {
   const [activeTab, setActiveTab] = useState('overview');
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
@@ -251,6 +261,25 @@ export default function ProjectDetailPage() {
 
   // Update the documents state to use ProjectDocument type
   const [documents, setDocuments] = useState<ProjectDocument[]>([]);
+
+  // Add this state declaration
+  const [transactionForm, setTransactionForm] = useState<TransactionFormState>({
+    date: getTodayDate(),
+    description: '',
+    category: 'Payment',
+    amount: '',
+    paymentMethod: 'Bank',
+    creditCardType: '',
+    lastFourDigits: '',
+    bankName: '',
+    checkNumber: '',
+    digitalPaymentUsername: '',
+    status: 'completed',
+    reference: generateTransactionReference(),
+    linkedTaskId: '',
+    linkedSubcontractorId: '',
+    attachments: []
+  });
 
   // Add this effect to load documents
   useEffect(() => {
@@ -585,34 +614,27 @@ export default function ProjectDetailPage() {
     }
   };
 
-  // Add these back
-  const getTodayDate = () => new Date().toISOString().split('T')[0];
-
-  const generateTransactionReference = () => {
-    const prefix = 'TRX';
-    const timestamp = Date.now().toString().slice(-6);
-    const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-    return `${prefix}-${timestamp}-${random}`;
+  // Move resetTransactionForm up, before it's used
+  const resetTransactionForm = () => {
+    setTransactionForm({
+      date: getTodayDate(),
+      description: '',
+      category: 'Payment',
+      amount: '',
+      paymentMethod: 'Bank',
+      creditCardType: '',
+      lastFourDigits: '',
+      bankName: '',
+      checkNumber: '',
+      digitalPaymentUsername: '',
+      status: 'completed',
+      reference: generateTransactionReference(),
+      linkedTaskId: '',
+      linkedSubcontractorId: '',
+      attachments: []
+    });
+    setTransactionAttachments([]);
   };
-
-  // Add these back
-  const [transactionForm, setTransactionForm] = useState<TransactionFormState>({
-    date: getTodayDate(),
-    description: '',
-    category: 'Payment',
-    amount: '',
-    paymentMethod: 'Bank',
-    creditCardType: '',
-    lastFourDigits: '',
-    bankName: '',
-    checkNumber: '',
-    digitalPaymentUsername: '',
-    status: 'completed',
-    reference: generateTransactionReference(),
-    linkedTaskId: '',
-    linkedSubcontractorId: '',
-    attachments: []
-  });
 
   // Add this new component for viewing attachments
   function AttachmentViewer({ attachment, onClose }: { attachment: any; onClose: () => void }) {
