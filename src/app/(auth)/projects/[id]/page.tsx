@@ -8,8 +8,8 @@ import { Document, Page, pdfjs } from 'react-pdf';
 // Set worker URL for PDF.js
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
-// Add these imports
-import { uploadProjectDocument, getProjectDocuments, type ProjectDocument } from '@/lib/firebase/documents';
+// Only import Firebase-related functions
+import { getProjectDocuments, type ProjectDocument } from '@/lib/firebase/documents';
 
 interface Transaction {
   id: string; // Add unique ID
@@ -127,14 +127,58 @@ const generateTransactionReference = () => {
 };
 
 export default function ProjectDetailPage() {
+  // 1. Basic states
   const [activeTab, setActiveTab] = useState('overview');
-  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
-  const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState(false);
+  
+  // 2. Transaction states
+  const [transactionForm, setTransactionForm] = useState<TransactionFormState>({
+    date: getTodayDate(),
+    description: '',
+    category: 'Payment',
+    amount: '',
+    paymentMethod: 'Bank',
+    creditCardType: '',
+    lastFourDigits: '',
+    bankName: '',
+    checkNumber: '',
+    digitalPaymentUsername: '',
+    status: 'completed',
+    reference: generateTransactionReference(),
+    linkedTaskId: '',
+    linkedSubcontractorId: '',
+    attachments: []
+  });
+  const [transactionAttachments, setTransactionAttachments] = useState<File[]>([]);
   const [isAddTransactionModalOpen, setIsAddTransactionModalOpen] = useState(false);
   const [isViewTransactionModalOpen, setIsViewTransactionModalOpen] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
+
+  // 3. Transaction functions
+  const resetTransactionForm = () => {
+    setTransactionForm({
+      date: getTodayDate(),
+      description: '',
+      category: 'Payment',
+      amount: '',
+      paymentMethod: 'Bank',
+      creditCardType: '',
+      lastFourDigits: '',
+      bankName: '',
+      checkNumber: '',
+      digitalPaymentUsername: '',
+      status: 'completed',
+      reference: generateTransactionReference(),
+      linkedTaskId: '',
+      linkedSubcontractorId: '',
+      attachments: []
+    });
+    setTransactionAttachments([]);
+  };
+
+  // 4. Other states
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState(false);
   const [selectedAttachment, setSelectedAttachment] = useState<any>(null);
-  const [transactionAttachments, setTransactionAttachments] = useState<File[]>([]);
   const [selectedMainCategory, setSelectedMainCategory] = useState<'owner' | 'construction' | 'contractor' | ''>('');
   const [selectedSubCategory, setSelectedSubCategory] = useState('');
   const [uploadForm, setUploadForm] = useState<UploadFormState>({
@@ -261,61 +305,6 @@ export default function ProjectDetailPage() {
 
   // Update the documents state to use ProjectDocument type
   const [documents, setDocuments] = useState<ProjectDocument[]>([]);
-
-  // Group all transaction-related state and functions together
-  const [transactionForm, setTransactionForm] = useState<TransactionFormState>({
-    date: getTodayDate(),
-    description: '',
-    category: 'Payment',
-    amount: '',
-    paymentMethod: 'Bank',
-    creditCardType: '',
-    lastFourDigits: '',
-    bankName: '',
-    checkNumber: '',
-    digitalPaymentUsername: '',
-    status: 'completed',
-    reference: generateTransactionReference(),
-    linkedTaskId: '',
-    linkedSubcontractorId: '',
-    attachments: []
-  });
-
-  // Define all transaction-related functions together
-  const resetTransactionForm = () => {
-    setTransactionForm({
-      date: getTodayDate(),
-      description: '',
-      category: 'Payment',
-      amount: '',
-      paymentMethod: 'Bank',
-      creditCardType: '',
-      lastFourDigits: '',
-      bankName: '',
-      checkNumber: '',
-      digitalPaymentUsername: '',
-      status: 'completed',
-      reference: generateTransactionReference(),
-      linkedTaskId: '',
-      linkedSubcontractorId: '',
-      attachments: []
-    });
-    setTransactionAttachments([]);
-  };
-
-  // Add this effect to load documents
-  useEffect(() => {
-    async function loadDocuments() {
-      try {
-        const docs = await getProjectDocuments('current-project-id'); // Replace with actual project ID
-        setDocuments(docs);
-      } catch (error) {
-        console.error('Error loading documents:', error);
-      }
-    }
-    
-    loadDocuments();
-  }, []);
 
   const documentCategories = {
     owner: [
