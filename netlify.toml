@@ -1,7 +1,7 @@
 [build]
   command = "npm run build"
   publish = ".next"
-  environment = { NODE_VERSION = "18" }
+  environment = { NODE_VERSION = "18.17.0" }
 
 [build.environment]
   NEXT_TELEMETRY_DISABLED = "1"
