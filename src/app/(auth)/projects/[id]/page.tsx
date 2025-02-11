@@ -15,7 +15,7 @@ import {
   getProjectDocuments,
   type ProjectDocument, 
   type UploadMetadata 
-} from '@/lib/firebase/documents';  // Change this line
+} from '@/lib/firebase/documents';
 
 interface Transaction {
   id: string; // Add unique ID
