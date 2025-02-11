@@ -1,0 +1,37 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Schema documents are read-only
+    match /_schema/{document=**} {
+      allow read: if true;
+      allow write: if false;
+    }
+    
+    // Users can only access their own data
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      
+      // Nested projects collection under each user
+      match /projects/{projectId} {
+        allow read: if request.auth != null && request.auth.uid == userId;
+        allow create: if request.auth != null 
+          && request.auth.uid == userId
+          && request.resource.data.keys().hasAll(['name', 'client', 'budget', 'deadline', 'status', 'team', 'userId', 'createdAt', 'updatedAt'])
+          && request.resource.data.userId == request.auth.uid;
+        allow update: if request.auth != null 
+          && request.auth.uid == userId
+          && resource.data.userId == request.auth.uid;
+        allow delete: if request.auth != null 
+          && request.auth.uid == userId
+          && resource.data.userId == request.auth.uid;
+      }
+    }
+
+    match /projects/{projectId} {
+      match /documents/{documentId} {
+        allow read: if request.auth != null;
+        allow write: if request.auth != null;
+      }
+    }
+  }
+} 

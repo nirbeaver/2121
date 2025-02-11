@@ -5,11 +5,12 @@ import { motion } from 'framer-motion';
 import { ArrowUp, ArrowDown, Eye, Share, MoreHorizontal, Building2, Calendar, DollarSign, MapPin, Phone, Mail, User, Plus, FileText, Download, Search, File, ChevronDown, ChevronRight, Edit, X } from 'lucide-react';
 import Link from 'next/link';
 import { Document, Page, pdfjs } from 'react-pdf';
+import Image from 'next/image';
 // Set worker URL for PDF.js
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
 // Only import Firebase-related functions
-import { getProjectDocuments, type ProjectDocument } from '@/lib/firebase/documents';
+import { getProjectDocuments, uploadProjectDocument, type ProjectDocument, type UploadMetadata } from '@/lib/firebase/documents';
 
 interface Transaction {
   id: string; // Add unique ID
@@ -126,7 +127,9 @@ const generateTransactionReference = () => {
   return `${prefix}-${timestamp}-${random}`;
 };
 
-export default function ProjectDetailPage() {
+export default function ProjectDetailPage({ params }: { params: { id: string } }) {
+  const projectId = params.id;  // Get projectId from URL params
+
   // 1. Basic states
   const [activeTab, setActiveTab] = useState('overview');
   
@@ -407,26 +410,30 @@ export default function ProjectDetailPage() {
     if (!uploadForm.file || !selectedMainCategory || !selectedSubCategory) return;
 
     try {
-      // Create document with all required properties
+      // Create metadata object
+      const metadata: UploadMetadata = {
+        mainCategory: selectedMainCategory as 'owner' | 'construction' | 'contractor',
+        subCategory: selectedSubCategory,
+        description: uploadForm.description,
+        uploadedBy: 'Current User' // Replace with actual user info
+      };
+
+      // Upload the document
       const newDoc = await uploadProjectDocument(
-        'current-project-id',
+        projectId,
         uploadForm.file,
-        {
-          mainCategory: selectedMainCategory,
-          subCategory: selectedSubCategory,
-          description: uploadForm.description,
-          category: selectedSubCategory,
-          uploadedBy: 'Current User Name'
-        }
+        metadata
       );
 
-      // Use the returned document directly as it has all required properties
+      // Add new document to the list
       setDocuments(prev => [newDoc, ...prev]);
       
+      // Close modal and reset form
       setIsUploadModalOpen(false);
       resetUploadForm();
     } catch (error) {
       console.error('Error uploading document:', error);
+      // Handle error (show error message to user)
     }
   };
 
@@ -853,6 +860,22 @@ export default function ProjectDetailPage() {
       </div>
     );
   }
+
+  // Add this near the top of your component
+  useEffect(() => {
+    async function loadDocuments() {
+      try {
+        const docs = await getProjectDocuments(projectId);
+        setDocuments(docs);
+      } catch (error) {
+        console.error('Error loading documents:', error);
+      }
+    }
+    
+    if (projectId) {
+      loadDocuments();
+    }
+  }, [projectId]);
 
   return (
     <div className="space-y-6">
