@@ -15,7 +15,7 @@ import {
   getProjectDocuments,
   type ProjectDocument, 
   type UploadMetadata 
-} from '@/lib/firebase/documents';
+} from '@/lib/firebase/documents';  // Make sure the path is correct
 
 interface Transaction {
   id: string; // Add unique ID
@@ -422,8 +422,9 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
         uploadedBy: 'Current User'
       };
 
+      // Use params.id instead of hardcoded value
       const newDoc = await uploadProjectDocument(
-        params.id,
+        params.id,  // Use the actual project ID from params
         uploadForm.file,
         metadata
       );
