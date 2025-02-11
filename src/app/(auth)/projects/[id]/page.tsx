@@ -17,9 +17,6 @@ import {
   type UploadMetadata 
 } from '@/lib/firebase/documents';
 
-// Add this import at the top of the file
-import { uploadProjectDocument } from "@/lib/firebase/firebaseUtils";
-
 interface Transaction {
   id: string; // Add unique ID
   projectId: string; // Add project ID

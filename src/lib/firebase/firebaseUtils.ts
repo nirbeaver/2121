@@ -21,9 +21,9 @@ import {
 import { ref, uploadBytes, getDownloadURL, getStorage, deleteObject } from "firebase/storage";
 
 // Auth functions
-export const logoutUser = () => signOut(auth);
+const logoutUser = () => signOut(auth);
 
-export const signInWithGoogle = async () => {
+const signInWithGoogle = async () => {
   const provider = new GoogleAuthProvider();
   try {
     const result = await signInWithPopup(auth, provider);
@@ -40,7 +40,7 @@ interface FirestoreDocument {
   [key: string]: any;
 }
 
-export async function addDocument<T extends DocumentData>(
+async function addDocument<T extends DocumentData>(
   collectionName: string, 
   data: T
 ): Promise<string> {
@@ -48,7 +48,7 @@ export async function addDocument<T extends DocumentData>(
   return docRef.id;
 }
 
-export async function getDocument<T>(
+async function getDocument<T>(
   collectionName: string, 
   documentId: string
 ): Promise<T & { id: string }> {
@@ -62,7 +62,7 @@ export async function getDocument<T>(
   return { id: docSnap.id, ...docSnap.data() } as T & { id: string };
 }
 
-export async function getDocuments<T>(
+async function getDocuments<T>(
   collectionName: string
 ): Promise<(T & { id: string })[]> {
   const querySnapshot = await getDocs(collection(db, collectionName));
@@ -72,7 +72,7 @@ export async function getDocuments<T>(
   })) as (T & { id: string })[];
 }
 
-export async function updateDocument<T extends DocumentData>(
+async function updateDocument<T extends DocumentData>(
   collectionName: string, 
   id: string, 
   data: Partial<T>
@@ -80,7 +80,7 @@ export async function updateDocument<T extends DocumentData>(
   await updateDoc(doc(db, collectionName, id), data);
 }
 
-export async function deleteDocument(
+async function deleteDocument(
   collectionName: string, 
   id: string
 ): Promise<void> {
@@ -88,7 +88,7 @@ export async function deleteDocument(
 }
 
 // Storage functions
-export async function uploadFile(
+async function uploadFile(
   file: File,
   path: string,
   metadata?: { contentType?: string }
@@ -98,7 +98,7 @@ export async function uploadFile(
   return getDownloadURL(storageRef);
 }
 
-export async function deleteFile(path: string): Promise<void> {
+async function deleteFile(path: string): Promise<void> {
   const storageRef = ref(storage, path);
   try {
     await deleteObject(storageRef);
@@ -109,7 +109,7 @@ export async function deleteFile(path: string): Promise<void> {
 }
 
 // Example usage for projects
-export interface Project {
+interface Project {
   name: string;
   description: string;
   documents: {
@@ -125,7 +125,7 @@ export interface Project {
   userId: string;
 }
 
-export async function createProject(project: Omit<Project, 'id'>): Promise<string> {
+async function createProject(project: Omit<Project, 'id'>): Promise<string> {
   return addDocument('projects', {
     ...project,
     createdAt: new Date(),
@@ -133,11 +133,11 @@ export async function createProject(project: Omit<Project, 'id'>): Promise<strin
   });
 }
 
-export async function getProject(projectId: string): Promise<Project & { id: string }> {
+async function getProject(projectId: string): Promise<Project & { id: string }> {
   return getDocument<Project>('projects', projectId);
 }
 
-export async function getUserProjects(userId: string): Promise<(Project & { id: string })[]> {
+async function getUserProjects(userId: string): Promise<(Project & { id: string })[]> {
   const projectsRef = collection(db, 'projects');
   const q = query(projectsRef, where('userId', '==', userId));
   const querySnapshot = await getDocs(q);
@@ -148,20 +148,7 @@ export async function getUserProjects(userId: string): Promise<(Project & { id: 
   })) as (Project & { id: string })[];
 }
 
-// Add a function to get project documents
-export async function getProjectDocuments(projectId: string) {
-  try {
-    const projectDoc = await getDoc(doc(db, 'projects', projectId));
-    if (!projectDoc.exists()) {
-      throw new Error('Project not found');
-    }
-    return projectDoc.data()?.documents || [];
-  } catch (error) {
-    console.error('Error getting project documents:', error);
-    throw error;
-  }
-}
-
+// Keep only one export statement at the bottom
 export {
   logoutUser,
   signInWithGoogle,
