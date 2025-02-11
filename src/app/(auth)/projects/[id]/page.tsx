@@ -17,6 +17,9 @@ import {
   type UploadMetadata 
 } from '@/lib/firebase/documents';
 
+// Add this import at the top of the file
+import { uploadProjectDocument } from "@/lib/firebase/firebaseUtils";
+
 interface Transaction {
   id: string; // Add unique ID
   projectId: string; // Add project ID
@@ -645,7 +648,13 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
           </div>
           <div className="p-4 max-h-[80vh] overflow-auto">
             {isImage ? (
-              <img src={attachment.url} alt={attachment.name} className="max-w-full h-auto" />
+              <Image 
+                src={attachment.url}
+                alt={attachment.name}
+                width={500}  // adjust based on your needs
+                height={300} // adjust based on your needs
+                className="w-full h-auto"
+              />
             ) : (
               <div className="text-center py-8">
                 <FileText className="w-16 h-16 mx-auto text-gray-400 mb-4" />
@@ -815,10 +824,12 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
               </object>
             ) : isImage ? (
               <div className="flex items-center justify-center h-full">
-                <img
+                <Image 
                   src={document.url}
                   alt={document.name}
-                  className="max-w-full max-h-full object-contain"
+                  width={500}  // adjust based on your needs
+                  height={300} // adjust based on your needs
+                  className="w-full h-auto"
                 />
               </div>
             ) : (

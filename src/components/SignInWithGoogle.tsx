@@ -12,11 +12,11 @@ export default function SignInWithGoogle() {
       className="flex items-center justify-center bg-white text-gray-700 font-semibold py-2 px-4 rounded-full border border-gray-300 hover:bg-gray-100 transition duration-300 ease-in-out"
     >
       <Image 
-        src="/google-icon.png" 
+        src="/google.svg" 
         alt="Google Sign In"
         width={24}
         height={24}
-        className="mr-2"
+        className="w-6 h-6 mr-2"
       />
       Sign in with Google
     </button>
