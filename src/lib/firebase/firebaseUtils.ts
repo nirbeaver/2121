@@ -98,43 +98,6 @@ export async function uploadFile(
   return getDownloadURL(storageRef);
 }
 
-/**
- * Uploads a project document to Firebase Storage with proper metadata
- */
-export async function uploadProjectDocument(
-  projectId: string,
-  file: File,
-  metadata: any
-): Promise<string> {
-  const storageRef = ref(storage, `projects/${projectId}/documents/${file.name}`);
-  
-  try {
-    // Upload the file with metadata and track in Firestore
-    const uploadResult = await uploadBytes(storageRef, file, metadata);
-    
-    // Get the download URL
-    const downloadURL = await getDownloadURL(uploadResult.ref);
-    
-    // Update the project document in Firestore
-    const projectRef = doc(db, 'projects', projectId);
-    await updateDoc(projectRef, {
-      documents: arrayUnion({
-        url: downloadURL,
-        path: `projects/${projectId}/documents/${file.name}`,
-        name: file.name,
-        type: file.type,
-        size: file.size,
-        uploadedAt: new Date().toISOString()
-      })
-    });
-
-    return downloadURL;
-  } catch (error) {
-    console.error('Error uploading document:', error);
-    throw error;
-  }
-}
-
 export async function deleteFile(path: string): Promise<void> {
   const storageRef = ref(storage, path);
   try {
@@ -198,3 +161,18 @@ export async function getProjectDocuments(projectId: string) {
     throw error;
   }
 }
+
+export {
+  logoutUser,
+  signInWithGoogle,
+  addDocument,
+  getDocument,
+  getDocuments,
+  updateDocument,
+  deleteDocument,
+  uploadFile,
+  deleteFile,
+  createProject,
+  getProject,
+  getUserProjects
+};

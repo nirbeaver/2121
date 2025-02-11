@@ -22,7 +22,7 @@ export interface UploadMetadata {
   uploadedBy: string;
 }
 
-export async function uploadProjectDocument(
+export function uploadProjectDocument(
   projectId: string,
   file: File,
   metadata: UploadMetadata
@@ -58,7 +58,7 @@ export async function uploadProjectDocument(
   }
 }
 
-export async function getProjectDocuments(
+export function getProjectDocuments(
   projectId: string
 ): Promise<ProjectDocument[]> {
   try {

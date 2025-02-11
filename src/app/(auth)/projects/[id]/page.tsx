@@ -15,7 +15,7 @@ import {
   getProjectDocuments,
   type ProjectDocument, 
   type UploadMetadata 
-} from '@/lib/firebase';
+} from '@/lib/firebase/documents';
 
 interface Transaction {
   id: string; // Add unique ID
@@ -419,24 +419,20 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
         mainCategory: selectedMainCategory,
         subCategory: selectedSubCategory,
         description: uploadForm.description,
-        uploadedBy: 'Current User' // Replace with actual user info
+        uploadedBy: 'Current User'
       };
 
       const newDoc = await uploadProjectDocument(
-        params.id, // Use the actual project ID from params
+        params.id,
         uploadForm.file,
         metadata
       );
 
-      // Add new document to the list
       setDocuments(prev => [newDoc, ...prev]);
-      
-      // Close modal and reset form
       setIsUploadModalOpen(false);
       resetUploadForm();
     } catch (error) {
       console.error('Error uploading document:', error);
-      // Handle error appropriately
     }
   };
 

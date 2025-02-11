@@ -6,17 +6,4 @@ export type { ProjectDocument, UploadMetadata } from './documents';
 export { uploadProjectDocument, getProjectDocuments } from './documents';
 
 // Export other utilities
-export {
-  logoutUser,
-  signInWithGoogle,
-  addDocument,
-  getDocument,
-  getDocuments,
-  updateDocument,
-  deleteDocument,
-  uploadFile,
-  deleteFile,
-  createProject,
-  getProject,
-  getUserProjects
-} from './firebaseUtils'; 
+export * from './firebaseUtils'; 
