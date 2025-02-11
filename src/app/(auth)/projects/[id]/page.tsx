@@ -9,13 +9,13 @@ import Image from 'next/image';
 // Set worker URL for PDF.js
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
-// Import from the index file
+// Import directly from documents.ts
 import { 
   uploadProjectDocument, 
   getProjectDocuments,
   type ProjectDocument, 
   type UploadMetadata 
-} from '@/lib/firebase';
+} from '@/lib/firebase/documents';  // Change this line
 
 interface Transaction {
   id: string; // Add unique ID
