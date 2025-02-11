@@ -2,7 +2,13 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, DollarSign, Calendar, Tag, ChevronDown, Filter } from 'lucide-react';
+import dynamic from 'next/dynamic';
+import { Plus as PlusIcon, DollarSign, Calendar, Tag, ChevronDown, Filter } from 'lucide-react';
+
+// Dynamically import Lucide icons
+const Plus = dynamic(() => import('lucide-react').then((mod) => mod.Plus), {
+  ssr: false
+});
 
 interface Expense {
   id: string;
@@ -12,6 +18,13 @@ interface Expense {
   date: string;
   paymentMethod: string;
   receipt?: string;
+}
+
+interface SummaryCardProps {
+  title: string;
+  value: string;
+  trend: string;
+  icon: LucideIcon;
 }
 
 export default function ExpensesPage() {
@@ -57,10 +70,10 @@ export default function ExpensesPage() {
         <h1 className="text-2xl font-semibold text-gray-900">Office Expenses</h1>
         <button
           onClick={() => setIsAddingExpense(true)}
-          className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 
+          className="flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 
                      text-white font-medium rounded-lg transition-colors"
         >
-          <Plus className="w-5 h-5 mr-2" />
+          <PlusIcon className="w-5 h-5 mr-2" />
           Add Expense
         </button>
       </div>
@@ -250,12 +263,7 @@ export default function ExpensesPage() {
   );
 }
 
-function SummaryCard({ title, value, trend, icon: Icon }: {
-  title: string;
-  value: string;
-  trend: string;
-  icon: any;
-}) {
+function SummaryCard({ title, value, trend, icon: Icon }: SummaryCardProps) {
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
       <div className="flex items-center">

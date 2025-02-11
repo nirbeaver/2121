@@ -22,11 +22,11 @@ export interface UploadMetadata {
   uploadedBy: string;
 }
 
-export async function uploadProjectDocument(
+export const uploadProjectDocument = async (
   projectId: string,
   file: File,
   metadata: UploadMetadata
-): Promise<ProjectDocument> {
+): Promise<ProjectDocument> => {
   try {
     const timestamp = Date.now();
     const uniqueFileName = `${timestamp}-${file.name}`;
@@ -56,9 +56,11 @@ export async function uploadProjectDocument(
     console.error('Error uploading document:', error);
     throw error;
   }
-}
+};
 
-export async function getProjectDocuments(projectId: string): Promise<ProjectDocument[]> {
+export const getProjectDocuments = async (
+  projectId: string
+): Promise<ProjectDocument[]> => {
   try {
     const docsRef = collection(db, 'projects', projectId, 'documents');
     const snapshot = await getDocs(docsRef);
@@ -71,4 +73,4 @@ export async function getProjectDocuments(projectId: string): Promise<ProjectDoc
     console.error('Error getting documents:', error);
     throw error;
   }
-} 
+}; 
