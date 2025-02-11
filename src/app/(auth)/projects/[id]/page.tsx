@@ -11,11 +11,11 @@ pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/$
 
 // Import from the index file
 import { 
+  uploadProjectDocument, 
+  getProjectDocuments,
   type ProjectDocument, 
-  type UploadMetadata,
-  uploadProjectDocument,
-  getProjectDocuments 
-} from '@/lib/firebase/documents';  // Import directly from documents
+  type UploadMetadata 
+} from '@/lib/firebase';
 
 interface Transaction {
   id: string; // Add unique ID
