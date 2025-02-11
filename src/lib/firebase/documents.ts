@@ -3,16 +3,16 @@ import { db } from "./firebase";
 import { uploadFile } from "./firebaseUtils";
 
 export interface ProjectDocument {
-  url: string;
-  path: string;
+  id: string;
   name: string;
-  type: string;
-  size: number;
-  uploadedAt: string;
+  url: string;
+  category: string;
   mainCategory: 'owner' | 'construction' | 'contractor';
   subCategory: string;
-  description?: string;
+  size: string;
+  uploadedDate: string;
   uploadedBy: string;
+  description?: string;
 }
 
 export interface UploadMetadata {
@@ -28,17 +28,21 @@ export async function uploadProjectDocument(
   metadata: UploadMetadata
 ): Promise<ProjectDocument> {
   try {
-    const path = `projects/${projectId}/documents/${file.name}`;
+    const timestamp = Date.now();
+    const path = `projects/${projectId}/documents/${timestamp}-${file.name}`;
     const url = await uploadFile(file, path);
 
     const documentData: ProjectDocument = {
-      url,
-      path,
+      id: `doc-${timestamp}`,
       name: file.name,
-      type: file.type,
-      size: file.size,
-      uploadedAt: new Date().toISOString(),
-      ...metadata
+      url,
+      category: metadata.subCategory,
+      mainCategory: metadata.mainCategory,
+      subCategory: metadata.subCategory,
+      size: `${(file.size / 1024 / 1024).toFixed(2)} MB`,
+      uploadedDate: new Date().toISOString(),
+      uploadedBy: metadata.uploadedBy,
+      description: metadata.description
     };
 
     const projectRef = doc(db, 'projects', projectId);
