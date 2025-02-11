@@ -415,17 +415,15 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
     if (!uploadForm.file || !selectedMainCategory || !selectedSubCategory) return;
 
     try {
-      // Create metadata object
       const metadata: UploadMetadata = {
-        mainCategory: selectedMainCategory as 'owner' | 'construction' | 'contractor',
+        mainCategory: selectedMainCategory,
         subCategory: selectedSubCategory,
         description: uploadForm.description,
         uploadedBy: 'Current User' // Replace with actual user info
       };
 
-      // Upload the document
       const newDoc = await uploadProjectDocument(
-        projectId,
+        params.id, // Use the actual project ID from params
         uploadForm.file,
         metadata
       );
@@ -438,7 +436,7 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
       resetUploadForm();
     } catch (error) {
       console.error('Error uploading document:', error);
-      // Handle error (show error message to user)
+      // Handle error appropriately
     }
   };
 

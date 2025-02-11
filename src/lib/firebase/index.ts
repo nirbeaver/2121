@@ -5,7 +5,7 @@ export { auth, db, storage, googleProvider } from './firebase';
 export type { ProjectDocument, UploadMetadata } from './documents';
 export { uploadProjectDocument, getProjectDocuments } from './documents';
 
-// Export other utilities explicitly
+// Export other utilities
 export {
   logoutUser,
   signInWithGoogle,
